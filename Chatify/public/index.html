@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatify</title>
+</head>
+<body>
+    <input id="name" type="text" placeholder="enter your name">
+    <button onclick="join()">Join</button>
+    <div id="chat-area" style="display: none;" >
+        <ul id="messages"></ul>
+        <input type="text" id="msgInput" placeholder="enter the message">
+        <button onclick="sendmsg()">Send</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let name = '';
+
+        function join(){
+            name = document.getElementById('name');
+            if(!name) return alert("Enter a valid name");
+            socket.emit('set-name',name.value.trim());
+            name.value = '';
+
+            const chatSection = document.getElementById('chat-area');
+            chatSection.style.display = 'block';
+        }
+        socket.on('joining',name=>{
+            showChat(`${name} joined the chat`);
+        });
+        socket.on('left',name=>{
+            showChat(`${name} left`);
+        })
+
+        socket.on('chat-msg',({from,text})=>{
+            showChat(`${from}: ${text}`);
+        });
+
+        function sendmsg(){
+            const input = document.getElementById('msgInput');
+            let msg = input.value.trim();
+            socket.emit('chat-msg',msg);
+            msg = '';
+        }
+
+        function showChat(message){
+            console.log(message)
+            const area = document.createElement('li');
+            area.textContent = message;
+            document.getElementById('messages').appendChild(area);
+        }
+
+    </script>
+</body>
+</html>
