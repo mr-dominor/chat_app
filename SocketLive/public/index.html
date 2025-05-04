@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocketLive</title>
+</head>
+<body>
+    <h2>Who's Live?</h2>
+    <div id="status"></div>
+    <ul id="users"></ul>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    const status = document.getElementById('status');
+    const users = document.getElementById('users');
+
+    socket.on('connect',()=>{
+        status.textContent = `Connected as ${socket.id}`;
+    });
+
+    socket.on('user-joining', id=>{
+        const msg = document.createElement('li');
+        msg.textContent = `${id} joined`;
+        users.appendChild(msg);
+    });
+
+    socket.on('user-left', id=>{
+        const msg = document.createElement('li');
+        msg.textContent = `${id} left`;
+        users.appendChild(msg);
+    });
+
+    socket.on('user-list', userList=>{
+        user.innerHTML = '';
+        userList.forEach(id => {
+            const msg = document.createElement('li');
+            msg.textContent = `User:${id}`;
+            users.appendChild(msg);
+        });
+    });
+
+</script>
+</html>
